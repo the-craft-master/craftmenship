@@ -1,23 +1,18 @@
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.input.Keyboard;
-import static org.lwjgl.opengl.GL11.*;
-
+import org.lwjgl.opengl.Display; 
+import org.lwjgl.opengl.DisplayMode; 
+import static org.lwjgl.opengl.GL11.*; 
+import org.lwjgl.util.glu.GLU;
 /**
  *
  * @author nathaniel
  */
 public class craftmenship {
+    private fpCamera fp = new fpCamera(0f,0f,0f); 
+    private DisplayMode displayMode;
     
-    public void startDraw()
-    {
-        while(!Display.isCloseRequested())
-        {
-            pollInput();
-            Display.update();
-            Display.sync(60);
-        }
-        Display.destroy();
+    public static void main(String[] args) {
+        craftmenship basic = new craftmenship();
+        basic.start();
     }
     
     public void start()
@@ -25,25 +20,27 @@ public class craftmenship {
         try{
             createWindow();
             initGL();
-            pollInput();
+            fp.gameLoop();
         }
         catch(Exception e)
         {
-        }
-    }
-    
-    public void pollInput()
-    {
-        if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
-        {
-            System.exit(0);
+            e.printStackTrace();
         }
     }
     
     private void createWindow() throws Exception{
         Display.setFullscreen(false);
         
-        Display.setDisplayMode(new DisplayMode(640, 480));
+        DisplayMode d[] = Display.getAvailableDisplayModes();
+        for(int i = 0; i < d.length; i++)
+        {
+            if(d[i].getWidth() == 640 && d[i].getHeight() == 480 && d[i].getBitsPerPixel() == 32)
+            {
+                displayMode = d[i];
+                break;
+            }
+        }
+        Display.setDisplayMode(displayMode);
         Display.setTitle(("Final Project - Craftmenship"));
         Display.create();
     }
@@ -51,15 +48,12 @@ public class craftmenship {
     private void initGL()
     {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        
-        glOrtho(-640, 640, -480, 480, 1, -1);
+        GLU.gluPerspective(100.0f, (float)displayMode.getWidth()/(float) displayMode.getHeight(), 0.1f, 300.0f);
         
         glMatrixMode(GL_MODELVIEW);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         
-        startDraw();
     }
 }
