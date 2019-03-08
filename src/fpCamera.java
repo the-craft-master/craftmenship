@@ -91,7 +91,7 @@ public class fpCamera {
         float lastTime = 0.0f; // when the last frame was 
         long time = 0;
         float mouseSensitivity = 0.09f; 
-        float movementSpeed = .35f; 
+        float movementSpeed = .05f; 
         //hide the mouse 
         Mouse.setGrabbed(true);
         // keep looping till the display window is closed the ESC key is down 
@@ -114,19 +114,19 @@ public class fpCamera {
             //we times the movementSpeed with dt this is a time scale
             //so if its a slow frame u move more then a fast frame
             //so on a slow computer you move just as fast as on a fast computer 
-            if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
+            if (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP))//move forward
             {
                 camera.walkForward(movementSpeed); 
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards 
+            if (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN))//move backwards 
             {
                 camera.walkBackwards(movementSpeed); 
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left 
+            if (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))//strafe left 
             {
                 camera.strafeLeft(movementSpeed);
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
+            if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT))//strafe right
             {
                 camera.strafeRight(movementSpeed); 
             }
