@@ -39,7 +39,7 @@ public class Chunks{
         try{
             URL path = Chunks.class.getResource("terrain.png");
             File f = new File(path.getFile());
-            //texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("fpCamera/terrain.png"));
+            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("fpcamera/terrain.png"));
         }
         catch(Exception e){
             System.out.print("Terrain File not found");
