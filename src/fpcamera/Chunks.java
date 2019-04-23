@@ -35,7 +35,7 @@ public class Chunks{
     
     //method: ChunkLoader
     //purpose: constructor
-    public Chunks(int startX, int startY, int startZ) {
+    public Chunks(int startX, int startY, int startZ, boolean chunkMode) {
         try{
             URL path = Chunks.class.getResource("terrain.png");
             File f = new File(path.getFile());
@@ -78,7 +78,7 @@ public class Chunks{
         VBOColorHandle = glGenBuffers();
         VBOVertexHandle = glGenBuffers();
         VBOTextureHandle = glGenBuffers();
-        rebuild(startX, startY, startZ);
+        rebuild(startX, startY, startZ, chunkMode);
     }
     //method: render
     //purpose: render the chunk
@@ -96,7 +96,7 @@ public class Chunks{
     }
     //method: rebuild
     //purpose: rebuild world
-    private void rebuild(float startX, float startY, float startZ) {  
+    private void rebuild(float startX, float startY, float startZ, boolean chunkMode) {  
         float persistance = 0;
         while (persistance < PMIN) {
             persistance = (PMAX)*random.nextFloat();
@@ -128,7 +128,10 @@ public class Chunks{
                 }
             }
         }
-        dirtLayer();
+        if(!chunkMode)
+            dirtLayer();
+        else
+            waterLayer();
         renderSandWater();
         bedrockLayer();
         bedrock();
@@ -326,13 +329,33 @@ public class Chunks{
                 }
                 y --;
                 if (y > 2){
-                Blocks[x][y][z].setType(Block.BlockType.BlockType_Grass);
-                Blocks[x][y-1][z].setType(Block.BlockType.BlockType_Dirt);
-                Blocks[x][y-2][z].setType(Block.BlockType.BlockType_Dirt);
+                    Blocks[x][y][z].setType(Block.BlockType.BlockType_Grass);
+                    Blocks[x][y-1][z].setType(Block.BlockType.BlockType_Dirt);
+                    Blocks[x][y-2][z].setType(Block.BlockType.BlockType_Dirt);
                 }
             }
         }
     }
+    
+    
+    //method: waterLayer
+    //purpose: this ensures that the top layer is Water
+    public void waterLayer(){
+        for (int x = 0; x < SIZE; x++) {
+            for (int z = 0; z < SIZE; z++) {
+                int y = 0;
+                while (y < SIZE - 1 && Blocks[x][y][z].active()){
+                    y ++;
+                }
+                y --;
+                if (y > 1){
+                    Blocks[x][y][z].setType(Block.BlockType.BlockType_Water);
+                    Blocks[x][y-1][z].setType(Block.BlockType.BlockType_Water);
+                }
+            }
+        }
+    }
+    
     //method: bedrockLayer
     //purpose:this initializes the floor of bedrock
     public void bedrockLayer(){

@@ -1,6 +1,5 @@
 package fpcamera;
 
-import fpcamera.Chunks;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
@@ -14,7 +13,25 @@ public class fpCamera {
     private float pitch = 0.0f;
     private Vector3f position = null;
     private Vector3f lookDirection = null;
-    final private Chunks chunk = new Chunks(0,0,0);
+    private Chunks chunk = new Chunks(0,0,0, false);
+    
+    private boolean gp = false;
+    private final float fogDensity = 0.1f;
+    float fogColor1[]= {0.5f, 0.5f, 0.5f, 1.0f};
+    private float fogColor[];
+    /*
+        GL_EXP - Basic rendered fog which fogs out all of the screen. 
+            It doesn't give much of a fog effect, but gets the job done on
+            older PC's.
+        GL_EXP2 - Is the next step up from GL_EXP. This will fog out all 
+            of the screen, however it will give more depth to the scene.
+        GL_LINEAR - This is the best fog rendering mode. Objects fade in 
+            and out of the fog much better.*/
+    private final int fogMode[] = {GL_EXP, GL_EXP2, GL_LINEAR};
+    private int fogfilter = 0;
+    private boolean fogEnable = false;
+    
+    public boolean chunkMode = false;
 
     //method: CameraController
     //purpose: Constructor
@@ -107,7 +124,26 @@ public class fpCamera {
       lightPosition.put(position.x).put(position.y).put(position.z).put(1.0f).flip();
       glLight(GL_LIGHT0, GL_POSITION, lightPosition);
     }
-
+    
+    private void fogInit(){
+        //fogColor = BufferUtils.createFloatBuffer(4);
+        //fogColor.put(0.5f).put(0.5f).put(0.5f).put(1.0f).flip();
+        //fogColor = {0.5f, 0.5f,0.5f, 1.0f};
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+        //glFogfv(GL_FOG_COLOR, fogColor1);            // Set Fog Color
+        glFogf(GL_FOG_DENSITY, fogDensity);              // How Dense Will The Fog Be
+        glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+        glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
+        glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
+        glEnable(GL_FOG);                   // Enables GL_FOG
+    }
+    
+    private void fogDisable(){
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glDisable(GL_FOG);                   // Disable GL_FOG
+    }
+    
     //method: renderLoop
     //purpose: loops the view render
     public void gameLoop(){
@@ -122,35 +158,75 @@ public class fpCamera {
             dy = Mouse.getDY();
             camera.yaw(dx * mouseSensitivity);  
             camera.pitch(dy * mouseSensitivity); 
-                if (Keyboard.isKeyDown(Keyboard.KEY_W))
+            if (Keyboard.isKeyDown(Keyboard.KEY_W))
+            {
+                camera.walkForward(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_A))
+            {
+                camera.strafeLeft(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_S))
+            {
+                camera.walkBackwards(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_D))
+            {
+                camera.strafeRight(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) 
+            {
+                camera.moveUp(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) 
+            {
+                camera.moveDown(movementSpeed);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_R)) 
+            {
+                if (!chunkMode)
                 {
-                    camera.walkForward(movementSpeed);
+                    chunkMode = true;
+                    chunk = new Chunks(0,0,0, chunkMode);
                 }
-                if (Keyboard.isKeyDown(Keyboard.KEY_A))
+                else
                 {
-                    camera.strafeLeft(movementSpeed);
+                    chunkMode = false;
+                    chunk = new Chunks(0,0,0, chunkMode);
                 }
-                if (Keyboard.isKeyDown(Keyboard.KEY_S))
+                chunk.render();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_F)) 
+            {
+                if(!fogEnable)
                 {
-                    camera.walkBackwards(movementSpeed);
+                    fogInit();
+                    fogEnable = true;
                 }
-                if (Keyboard.isKeyDown(Keyboard.KEY_D))
+                else
                 {
-                    camera.strafeRight(movementSpeed);
+                    fogDisable();
+                    fogEnable = false;
                 }
-                if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) 
-                {
-                    camera.moveUp(movementSpeed);
-                }
-                if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) 
-                {
-                    camera.moveDown(movementSpeed);
-                }
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_G)) 
+            {
+                gp = true;
+                fogfilter += 1;
+                if(fogfilter > 2)
+                    fogfilter = 0;
+                glFogi(GL_FOG_MODE, fogMode[fogfilter]);
+            }
+            if (!Keyboard.isKeyDown(Keyboard.KEY_G)) 
+            {
+                gp = false;
+            }
             glLoadIdentity();
             camera.lookThrough(); 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             chunk.render();
             Display.update();
+            
             Display.sync(60);
         }
         Display.destroy();
