@@ -80,6 +80,7 @@ public class Chunks{
         VBOTextureHandle = glGenBuffers();
         rebuild(startX, startY, startZ, chunkMode);
     }
+    
     //method: render
     //purpose: render the chunk
     public void render(){
@@ -351,6 +352,7 @@ public class Chunks{
                 if (y > 1){
                     Blocks[x][y][z].setType(Block.BlockType.BlockType_Water);
                     Blocks[x][y-1][z].setType(Block.BlockType.BlockType_Water);
+                    Blocks[x][y-2][z].setType(Block.BlockType.BlockType_Water);
                 }
             }
         }
