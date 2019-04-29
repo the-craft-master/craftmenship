@@ -28,13 +28,15 @@ public class fpCamera {
         GL_LINEAR - This is the best fog rendering mode. Objects fade in 
             and out of the fog much better.
     */
+    
+    public boolean chunkMode = false;
+    
     private final int fogMode[] = {GL_EXP, GL_EXP2, GL_LINEAR};
     private int fogfilter = 0;
     private boolean fogEnable = false;
-    public boolean chunkMode = false;
+    
     
     private boolean cycleEnable = false;
-    
     private FloatBuffer movingLightPosition;
     private FloatBuffer movingLight;
     private FloatBuffer movingDarkPosition;
@@ -139,22 +141,21 @@ public class fpCamera {
     private void fogInit(){
         fogColor = BufferUtils.createFloatBuffer(4);
         fogColor.put(0.5f).put(0.5f).put(0.5f).put(1.0f).flip();
-        //fogColor = {0.5f, 0.5f,0.5f, 1.0f};
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+        glFogi(GL_FOG_MODE, fogMode[fogfilter]);  // Fog Mode
         glFog(GL_FOG_COLOR, fogColor);            // Set Fog Color
-        glFogf(GL_FOG_DENSITY, fogDensity);              // How Dense Will The Fog Be
-        glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-        glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
-        glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-        glEnable(GL_FOG);                   // Enables GL_FOG
+        glFogf(GL_FOG_DENSITY, fogDensity);       // How Dense Will The Fog Be
+        glHint(GL_FOG_HINT, GL_DONT_CARE);        // Fog Hint Value
+        glFogf(GL_FOG_START, 1.0f);               // Fog Start Depth
+        glFogf(GL_FOG_END, 5.0f);                 // Fog End Depth
+        glEnable(GL_FOG);                         // Enables GL_FOG
     }
     
     //method: fogDisable
     //purpose: disable fog weather
     private void fogDisable(){
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glDisable(GL_FOG);                   // Disable GL_FOG
+        glDisable(GL_FOG);                        // Disable GL_FOG
     }
     
     private void cycleInit() {
@@ -272,7 +273,19 @@ public class fpCamera {
                 fogfilter += 1;
                 if(fogfilter > 2)
                     fogfilter = 0;
-                glFogi(GL_FOG_MODE, fogMode[fogfilter]);
+                switch (fogfilter) {
+                    case 0:
+                        glFogi(GL_FOG_MODE, GL_EXP);
+                        break;
+                    case 1:
+                        glFogi(GL_FOG_MODE, GL_EXP2);
+                        break;
+                    case 2:
+                        glFogi(GL_FOG_MODE, GL_LINEAR);
+                        break;
+                    default:
+                        break;
+                }
             }
             
             if (!Keyboard.isKeyDown(Keyboard.KEY_G)) 

@@ -349,7 +349,7 @@ public class Chunks{
                     y ++;
                 }
                 y --;
-                if (y > 1){
+                if (y > 2){
                     Blocks[x][y][z].setType(Block.BlockType.BlockType_Water);
                     Blocks[x][y-1][z].setType(Block.BlockType.BlockType_Water);
                     Blocks[x][y-2][z].setType(Block.BlockType.BlockType_Water);

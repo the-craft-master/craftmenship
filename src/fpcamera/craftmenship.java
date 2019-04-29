@@ -46,7 +46,7 @@ public class craftmenship {
     //method: createWindow
     //purpose: sets the window parameters
     private void createWindow() throws Exception{
-        Display.setFullscreen(false);
+        Display.setFullscreen(true);
         DisplayMode d[] =
         Display.getAvailableDisplayModes();
         for (DisplayMode d1 : d) {
